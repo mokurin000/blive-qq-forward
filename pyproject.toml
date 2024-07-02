@@ -1,16 +1,20 @@
-[tool.poetry]
+[project]
 name = "blive-qq-forward"
 version = "0.1.0"
-description = "BLive -> QQ channels forwarder"
-authors = ["poly000 <1348292515a@gmail.com>"]
-license = "MIT"
+description = "BLive -> QQ forwarder"
+authors = [{ name = "mokurin000", email = "1348292515a@gmail.com" }]
+dependencies = [
+    "blivedm@git+https://github.com/mokurin000/blivedm.git@pep621-package",
+    "bilibili-api-python>=16.2.0",
+]
+requires-python = ">=3.12"
 readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.12"
-blivedm = { git = "git+ssh://git@github.com/mokurin000/blivedm.git", branch = "poetry-package" }
-
+license = { text = "MIT" }
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[tool.pdm]
+distribution = true
