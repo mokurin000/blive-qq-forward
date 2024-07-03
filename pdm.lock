@@ -4,8 +4,8 @@
 [metadata]
 groups = ["default"]
 strategy = ["cross_platform", "inherit_metadata"]
-lock_version = "4.4.2"
-content_hash = "sha256:9dd1b0f9e05c86348225eac03bd170d397601d868eee98181a77dfaa72080a7c"
+lock_version = "4.4.1"
+content_hash = "sha256:71fb7e6fdcc3eaea8a470091aecc49b592d7b7d7b6134a6542576566bf3d83d6"
 
 [[package]]
 name = "aiohttp"
@@ -470,6 +470,21 @@ files = [
     {file = "PyYAML-6.0.1-cp312-cp312-win32.whl", hash = "sha256:d483d2cdf104e7c9fa60c544d92981f12ad66a457afae824d146093b8c294c54"},
     {file = "PyYAML-6.0.1-cp312-cp312-win_amd64.whl", hash = "sha256:0d3304d8c0adc42be59c5f8a4d9e3d7379e6955ad754aa9d6ab7a398b59dd1df"},
     {file = "PyYAML-6.0.1.tar.gz", hash = "sha256:bfdf460b1736c775f2ba9f6a92bca30bc2095067b8a9d77876d1fad6cc3b4a43"},
+]
+
+[[package]]
+name = "qq-botpy"
+version = "1.2.1"
+summary = "qq robot client with python3"
+groups = ["default"]
+dependencies = [
+    "APScheduler",
+    "PyYAML",
+    "aiohttp<4,>=3.7.4",
+]
+files = [
+    {file = "qq-botpy-1.2.1.tar.gz", hash = "sha256:442172a0557a9b43d2777d1c5e072090a9d1a54d588d1c5da8d3efc014f4887f"},
+    {file = "qq_botpy-1.2.1-py3-none-any.whl", hash = "sha256:18b215690dfed88f711322136ec54b6760040b9b1608eb5db7a44e00f59e4f01"},
 ]
 
 [[package]]

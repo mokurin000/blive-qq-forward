@@ -1,120 +1,51 @@
 # -*- coding: utf-8 -*-
-import asyncio
-import http.cookies
-import logging
+import os
+from datetime import datetime
 
-import aiohttp
-from bilibili_api import CredentialNoSessdataException, login, user
+import botpy
+from botpy import logging
+from botpy.ext.cog_yaml import read
+from botpy.message import Message
 
-import blivedm
-import blivedm.models.web as web_models
+test_config = read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
-logger = logging.getLogger(__package__)
-
-# 直播间ID的取值看直播间URL
-TEST_ROOM_IDS = [
-    12235923,
-    14327465,
-    21396545,
-    21449083,
-    23105590,
-]
+_log = logging.get_logger()
+_start = datetime.now()
 
 
-async def main():
-    logging.basicConfig(filename=f'{__package__}.log', level=logging.INFO, encoding="utf-8")
-    logger.addHandler(logging.StreamHandler())
+class MyClient(botpy.Client):
+    async def on_ready(self):
+        _log.info(f"robot 「{self.robot.name}」 on_ready!")
 
-    # 这里填一个已登录账号的cookie的SESSDATA字段的值。不填也可以连接，但是收到弹幕的用户名会打码，UID会变成0
-    sessdata = ""
+    async def on_at_message_create(self, message: Message):
+        """
+        消息回调
+        """
 
-    if not sessdata:
-        try:
-            cred = login.login_with_qrcode()
-        except CredentialNoSessdataException:
-            cred = None
+        channel_id = message.channel_id
+        username = message.author.username
+        guild_id = message.guild_id
 
-        if cred is None or cred.sessdata is None:
-            print("登录失败！")
-        else:
-            sessdata = cred.sessdata
-    
-    user_info = await user.get_self_info(credential=cred)
-    print(f"登陆成功！欢迎回来，{user_info["name"]}")
+        _log.info(
+            f"received {message.content} by {username} from {guild_id}-{channel_id}"
+        )
 
-    session = init_session(sessdata=sessdata)
-    try:
-        await run_multi_clients(session=session)
-    finally:
-        await session.close()
+        if message.content.strip().endswith("/状态"):
+            roles = await self.api.get_guild_roles(guild_id)
+            print(roles)
 
-
-def init_session(sessdata: str = ""):
-    cookies = http.cookies.SimpleCookie()
-    cookies["SESSDATA"] = sessdata
-    cookies["SESSDATA"]["domain"] = "bilibili.com"
-
-    session = aiohttp.ClientSession()
-    session.cookie_jar.update_cookies(cookies)
-    return session
-
-
-async def run_multi_clients(session):
-    """
-    演示同时监听多个直播间
-    """
-    clients = [
-        blivedm.BLiveClient(room_id, session=session) for room_id in TEST_ROOM_IDS
-    ]
-    handler = MyHandler()
-    for client in clients:
-        client.set_handler(handler)
-        client.start()
-
-    try:
-        await asyncio.gather(*(client.join() for client in clients))
-    finally:
-        await asyncio.gather(*(client.stop_and_close() for client in clients))
-
-
-class MyHandler(blivedm.BaseHandler):
-    # # 演示如何添加自定义回调
-    # _CMD_CALLBACK_DICT = blivedm.BaseHandler._CMD_CALLBACK_DICT.copy()
-    #
-    # # 入场消息回调
-    # def __interact_word_callback(self, client: blivedm.BLiveClient, command: dict):
-    #     print(f"[{client.room_id}] INTERACT_WORD: self_type={type(self).__name__}, room_id={client.room_id},"
-    #           f" uname={command['data']['uname']}")
-    # _CMD_CALLBACK_DICT['INTERACT_WORD'] = __interact_word_callback  # noqa
-
-    def _on_heartbeat(
-        self, client: blivedm.BLiveClient, message: web_models.HeartbeatMessage
-    ):
-        logger.debug("[%d] %s", client.room_id, str(message))
-
-    def _on_danmaku(
-        self, client: blivedm.BLiveClient, message: web_models.DanmakuMessage
-    ):
-        logger.info("[%d]-弹幕 %s：%s", client.room_id, message.uname, message.msg)
-
-    def _on_gift(self, client: blivedm.BLiveClient, message: web_models.GiftMessage):
-        log = (
-            f"[{client.room_id}] {message.uname} 赠送{message.gift_name}x{message.num}"
-            f" （{message.coin_type}瓜子x{message.total_coin}）")
-        logger.info(log)
-
-    def _on_buy_guard(
-        self, client: blivedm.BLiveClient, message: web_models.GuardBuyMessage
-    ):
-        log = f"[{client.room_id}] {message.username} 购买{message.gift_name}"
-        logger.info(log)
-
-    def _on_super_chat(
-        self, client: blivedm.BLiveClient, message: web_models.SuperChatMessage
-    ):
-        log = f"[{client.room_id}] 醒目留言 ¥{message.price} {message.uname}：{message.message}"
-        logger.info(log)
+        await self.api.post_message(
+            channel_id=channel_id,
+            content=(
+                "你好呀~ 我是Blive推送姬，请多多指教~\n"
+                f"username: {username}\n"
+                f"gulid_id: {guild_id}\n"
+                f"channel_id: {channel_id}\n"
+            ),
+        )
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    intents = botpy.Intents(public_guild_messages=True)
+    client = MyClient(intents=intents)
+    client.run(appid=test_config["appid"], secret=test_config["secret"])
