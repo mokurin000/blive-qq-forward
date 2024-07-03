@@ -1,69 +1,50 @@
 # -*- coding: utf-8 -*-
-import os
-from datetime import datetime
+import asyncio
 
 import botpy
-from botpy import logging
-from botpy.errors import ServerError
 from botpy.ext.cog_yaml import read
-from botpy.message import Message, MessageAudit
+from botpy.errors import ServerError
 
-test_config = read(os.path.join(os.path.dirname(__file__), "config.yaml"))
+from blive_qq_forward import blive, settings
+from blive_qq_forward.blive import init_logs
+from blive_qq_forward.blive import make_multiple_clients, init_session_with_login
+from blive_qq_forward.myclient import MyClient
+from blive_qq_forward.settings import CONFIGURATION_PATH
 
-_log = logging.get_logger()
-_start = datetime.now()
+
+bot_config = read(CONFIGURATION_PATH)
 
 
-class MyClient(botpy.Client):
-    async def on_ready(self):
-        assert self.robot is not None
-        _log.info(f"robot 「{self.robot.name}」 on_ready!")
+def load_settings():
+    settings.appid = bot_config["appid"]
+    settings.secret = bot_config["secret"]
+    settings.super_admins = bot_config["super_admins"]
+    settings.channels = bot_config["channels"]
+    settings.room_ids = bot_config["room_ids"]
 
-    async def on_at_message_create(self, message: Message):
-        """
-        消息回调
-        """
 
-        channel_id = message.channel_id
-        username = message.author.username
-        guild_id = message.guild_id
+async def main():
+    init_logs()
+    load_settings()
 
-        _log.info(
-            f"received {message.content} by {username} from {guild_id}-{channel_id}"
-        )
+    intents = botpy.Intents(public_guild_messages=True, message_audit=True)
 
-        if message.content.strip().endswith("/状态"):
-            roles = await self.api.get_guild_roles(guild_id)
-            print(roles)
+    session = await init_session_with_login()
 
-        try:
-            await self.api.post_message(
-                channel_id=channel_id,
-                content=(
-                    "你好呀~ 我是Blive推送姬，请多多指教~\n"
-                    f"username: {username}\n"
-                    f"gulid_id: {guild_id}\n"
-                    f"channel_id: {channel_id}\n"
-                ),
-            )
-        except ServerError:
-            # 跳过审查报错
-            pass
+    client = MyClient(intents=intents)
+    blive.qqbot_client = client
+    blive_clients = make_multiple_clients(session=session, room_ids=settings.room_ids)
 
-    async def on_message_audit_pass(self, message: MessageAudit):
-        """
-        监听审核通过
-        """
-        _log.info(f"Message {message.message_id} passed audit!")
+    try:
+        await client.start(appid=settings.appid, secret=settings.secret)
+    except ServerError:
+        pass
 
-    async def on_message_audit_reject(self, message: MessageAudit):
-        """
-        监听审核不通过
-        """
-        _log.warn(f"Message {message.message_id} was rejected!")
+    try:
+        await asyncio.gather(*(client.join() for client in blive_clients))
+    finally:
+        await asyncio.gather(*(client.stop_and_close() for client in blive_clients))
 
 
 if __name__ == "__main__":
-    intents = botpy.Intents(public_guild_messages=True, message_audit=True)
-    client = MyClient(intents=intents)
-    client.run(appid=test_config["appid"], secret=test_config["secret"])
+    asyncio.run(main())
