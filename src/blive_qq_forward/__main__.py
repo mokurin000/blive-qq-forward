@@ -8,7 +8,7 @@ from botpy.errors import ServerError
 from blive_qq_forward import blive, settings
 from blive_qq_forward.blive import init_logs
 from blive_qq_forward.blive import make_multiple_clients, init_session_with_login
-from blive_qq_forward.myclient import MyClient
+from blive_qq_forward.push_client import PushClient
 from blive_qq_forward.settings import CONFIGURATION_PATH
 
 
@@ -31,7 +31,7 @@ async def main():
 
     session = await init_session_with_login()
 
-    client = MyClient(intents=intents)
+    client = PushClient(intents=intents)
     blive.qqbot_client = client
     blive_clients = make_multiple_clients(session=session, room_ids=settings.room_ids)
 

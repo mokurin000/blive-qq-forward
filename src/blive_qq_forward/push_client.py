@@ -12,7 +12,7 @@ _log = logging.get_logger()
 _start = datetime.now()
 
 
-class MyClient(botpy.Client):
+class PushClient(botpy.Client):
     async def on_ready(self):
         assert self.robot is not None
         _log.info(f"robot 「{self.robot.name}」 on_ready!")

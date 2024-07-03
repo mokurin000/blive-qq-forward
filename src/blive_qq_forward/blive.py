@@ -8,11 +8,11 @@ import blivedm
 import blivedm.models.web as web_models
 from bilibili_api import CredentialNoSessdataException, login, user
 
-from blive_qq_forward.myclient import MyClient
+from blive_qq_forward.push_client import PushClient
 from blive_qq_forward import settings
 
 
-qqbot_client: MyClient = None
+qqbot_client: PushClient = None
 
 logger = logging.getLogger(__package__)
 
