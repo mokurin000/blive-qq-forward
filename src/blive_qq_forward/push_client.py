@@ -59,7 +59,7 @@ class PushClient(botpy.Client):
                 f"gulid_id: {guild_id}\n"
                 f"channel_id: {channel_id}\n"
                 "\n"
-                f"已运行时间：{dur_days}d{dur_hours}h{dur_mins}m{dur_secs}s"
+                f"已运行时间：{dur_days}d{dur_hours:02}h{dur_mins:02}m{dur_secs:02}s"
             )
 
         if command.endswith("/启用"):

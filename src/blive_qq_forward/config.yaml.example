@@ -6,3 +6,5 @@ room_ids:
 secret: ''
 super_admins:
 - '123456'
+
+send_gift: true

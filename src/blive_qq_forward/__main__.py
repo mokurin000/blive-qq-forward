@@ -12,12 +12,12 @@ from blive_qq_forward.push_client import PushClient
 from blive_qq_forward.settings import CONFIGURATION_PATH
 
 
-bot_config = read(CONFIGURATION_PATH)
-
-
 def load_settings():
+    bot_config = read(CONFIGURATION_PATH)
+
     settings.appid = bot_config["appid"]
     settings.secret = bot_config["secret"]
+    settings.send_gift = bot_config["send_gift"]
     settings.super_admins = bot_config["super_admins"]
     settings.channels = bot_config["channels"]
     settings.room_ids = bot_config["room_ids"]

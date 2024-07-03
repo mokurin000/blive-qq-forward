@@ -128,6 +128,12 @@ class MyHandler(blivedm.BaseHandler):
             f"[{client.room_id}] {message.uname} 赠送{
                 message.gift_name}x{message.num}"
             f" （{message.coin_type}瓜子x{message.total_coin}）")
+
+        channels = settings.channels
+        if settings.send_gift:
+            # pylint: disable=not-an-iterable
+            payloads = [qqbot_client.send_message(channel_id=channel, content=log) for channel in channels]
+            asyncio.run(asyncio.gather(*payloads))
         logger.info(log)
 
     def _on_buy_guard(
