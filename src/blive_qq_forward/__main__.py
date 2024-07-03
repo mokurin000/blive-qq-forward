@@ -5,7 +5,7 @@ from datetime import datetime
 import botpy
 from botpy import logging
 from botpy.ext.cog_yaml import read
-from botpy.message import Message
+from botpy.message import Message, MessageAudit
 
 test_config = read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
@@ -44,8 +44,20 @@ class MyClient(botpy.Client):
             ),
         )
 
+    async def on_message_audit_pass(self, message: MessageAudit):
+        """
+        监听审核通过
+        """
+        _log.info(f"Message {message.message_id} passed audit!")
+
+    async def on_message_audit_reject(self, message: MessageAudit):
+        """
+        监听审核不通过
+        """
+        _log.warn(f"Message {message.message_id} was rejected!")
+
 
 if __name__ == "__main__":
-    intents = botpy.Intents(public_guild_messages=True)
+    intents = botpy.Intents(public_guild_messages=True, message_audit=True)
     client = MyClient(intents=intents)
     client.run(appid=test_config["appid"], secret=test_config["secret"])
