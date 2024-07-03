@@ -59,19 +59,28 @@ def init_session(sessdata: str = ""):
     session.cookie_jar.update_cookies(cookies)
     return session
 
-
-async def run_multi_clients(session):
-    """
-    演示同时监听多个直播间
-    """
+def get_multiple_clients(session, room_ids: list[int]):
     clients = [
         blivedm.BLiveClient(room_id, session=session)
-        for room_id in TEST_ROOM_IDS
+        for room_id in room_ids
     ]
     handler = MyHandler()
     for client in clients:
         client.set_handler(handler)
         client.start()
+
+    return clients
+
+
+async def run_multi_clients(session, room_ids=None):
+    """
+    演示同时监听多个直播间
+    """
+
+    if room_ids is None:
+        room_ids = TEST_ROOM_IDS
+
+    clients = get_multiple_clients(session, room_ids=room_ids)
 
     try:
         await asyncio.gather(*(client.join() for client in clients))
