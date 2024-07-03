@@ -4,6 +4,7 @@ from datetime import datetime
 
 import botpy
 from botpy import logging
+from botpy.errors import ServerError
 from botpy.ext.cog_yaml import read
 from botpy.message import Message, MessageAudit
 
@@ -15,6 +16,7 @@ _start = datetime.now()
 
 class MyClient(botpy.Client):
     async def on_ready(self):
+        assert self.robot is not None
         _log.info(f"robot 「{self.robot.name}」 on_ready!")
 
     async def on_at_message_create(self, message: Message):
@@ -34,15 +36,19 @@ class MyClient(botpy.Client):
             roles = await self.api.get_guild_roles(guild_id)
             print(roles)
 
-        await self.api.post_message(
-            channel_id=channel_id,
-            content=(
-                "你好呀~ 我是Blive推送姬，请多多指教~\n"
-                f"username: {username}\n"
-                f"gulid_id: {guild_id}\n"
-                f"channel_id: {channel_id}\n"
-            ),
-        )
+        try:
+            await self.api.post_message(
+                channel_id=channel_id,
+                content=(
+                    "你好呀~ 我是Blive推送姬，请多多指教~\n"
+                    f"username: {username}\n"
+                    f"gulid_id: {guild_id}\n"
+                    f"channel_id: {channel_id}\n"
+                ),
+            )
+        except ServerError:
+            # 跳过审查报错
+            pass
 
     async def on_message_audit_pass(self, message: MessageAudit):
         """

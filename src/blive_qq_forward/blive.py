@@ -37,11 +37,13 @@ async def main():
 
         if cred is None or cred.sessdata is None:
             print("登录失败！")
+            cred = None
         else:
             sessdata = cred.sessdata
 
-    user_info = await user.get_self_info(credential=cred)
-    print(f"登陆成功！欢迎回来，{user_info["name"]}")
+    if cred is not None:
+        user_info = await user.get_self_info(credential=cred)
+        print(f"登陆成功！欢迎回来，{user_info["name"]}")
 
     session = init_session(sessdata=sessdata)
     try:
