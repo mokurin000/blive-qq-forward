@@ -1,5 +1,8 @@
-appid: ""
-secret: ""
-super_admins: ["123456"]
-channels: ["123456"]
-room_ids: [123456]
+appid: ''
+channels:
+- '123456'
+room_ids:
+- 123456
+secret: ''
+super_admins:
+- '123456'

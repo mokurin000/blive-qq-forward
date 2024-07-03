@@ -5,7 +5,7 @@ from botpy import logging
 from botpy.errors import ServerError
 from botpy.message import Message, MessageAudit
 
-from blive_qq_forward.settings import super_admins, channels
+from blive_qq_forward import settings
 from blive_qq_forward.settings import save_settings
 
 _log = logging.get_logger()
@@ -26,6 +26,9 @@ class MyClient(botpy.Client):
         username = message.author.username
         user_id = message.author.id
         guild_id = message.guild_id
+
+        super_admins = settings.super_admins
+        channels = settings.channels
 
         _log.info(
             f"received {message.content} by {username} from {guild_id}-{channel_id}"
@@ -72,12 +75,12 @@ class MyClient(botpy.Client):
 
             else:
                 _log.warn(f"非法命令！{username} ({user_id})")
-                msg = f"很抱歉，{username}，您无权使用该命令！"
+                msg = f"很抱歉，{username}，您无权使用该命令！\n管理员列表：\n{"\n".join(super_admins)}"
 
         if command.endswith("/禁用"):
             # pylint: disable=unsupported-membership-test
             if super_admins is not None and user_id in super_admins:
-                if message.channel_id not in channels:
+                if message.channel_id in channels:
                     channels.remove(channel_id)
                     msg = f"频道 {channel_id} 禁用成功！"
                     _log.info(f"已禁用频道 {channel_id} 的推送")
@@ -87,7 +90,7 @@ class MyClient(botpy.Client):
 
             else:
                 _log.warn(f"非法命令！{username} ({user_id})")
-                msg = f"很抱歉，{username}，您无权使用该命令！"
+                msg = f"很抱歉，{username}，您无权使用该命令！\n管理员列表：\n{"\n".join(super_admins)}"
 
         await self.send_message(channel_id=channel_id, content=msg, msg_id=message.id)
 

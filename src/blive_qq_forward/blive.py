@@ -9,7 +9,7 @@ import blivedm.models.web as web_models
 from bilibili_api import CredentialNoSessdataException, login, user
 
 from blive_qq_forward.myclient import MyClient
-from blive_qq_forward.settings import channels
+from blive_qq_forward import settings
 
 
 qqbot_client: MyClient = None
@@ -134,6 +134,8 @@ class MyHandler(blivedm.BaseHandler):
         self, client: blivedm.BLiveClient, message: web_models.GuardBuyMessage
     ):
         log = f"[{client.room_id}] {message.username} 购买{message.gift_name}"
+
+        channels = settings.channels
         # pylint: disable=not-an-iterable
         payloads = [qqbot_client.send_message(channel_id=channel, content=log) for channel in channels]
         asyncio.run(asyncio.gather(*payloads))
@@ -144,6 +146,8 @@ class MyHandler(blivedm.BaseHandler):
     ):
         log = f"[{client.room_id}] 醒目留言 ¥{message.price} {
             message.uname}：{message.message}"
+
+        channels = settings.channels
         # pylint: disable=not-an-iterable
         payloads = [qqbot_client.send_message(channel_id=channel, content=log) for channel in channels]
         asyncio.run(asyncio.gather(*payloads))

@@ -39,11 +39,11 @@ async def main():
         await client.start(appid=settings.appid, secret=settings.secret)
     except ServerError:
         pass
-
-    try:
-        await asyncio.gather(*(client.join() for client in blive_clients))
     finally:
-        await asyncio.gather(*(client.stop_and_close() for client in blive_clients))
+        try:
+            await asyncio.gather(*(client.join() for client in blive_clients))
+        finally:
+            await asyncio.gather(*(client.stop_and_close() for client in blive_clients))
 
 
 if __name__ == "__main__":
