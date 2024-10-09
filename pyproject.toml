@@ -5,7 +5,7 @@ description = "BLive -> QQ forwarder"
 authors = [{ name = "mokurin000", email = "1348292515a@gmail.com" }]
 dependencies = [
     "blivedm@git+https://github.com/xfgryujk/blivedm.git",
-    "bilibili-api-python>=16.3.0",
+    "bilibili-api-python>=16.2.0",
     "qq-botpy>=1.2.1",
 ]
 requires-python = ">=3.12"
