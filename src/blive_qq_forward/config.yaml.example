@@ -1,9 +1,10 @@
 appid: ''
+secret: ''
+
 channels:
 - '123456'
 room_ids:
 - 123456
-secret: ''
 super_admins:
 - '123456'
 

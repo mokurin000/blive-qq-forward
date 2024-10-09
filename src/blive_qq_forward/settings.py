@@ -1,5 +1,7 @@
 import os
 
+import yaml
+
 CONFIGURATION_PATH = os.path.join(os.path.dirname(__file__), "config.yaml")
 
 appid = ""
@@ -24,7 +26,5 @@ def get_settings() -> dict:
 
 
 def save_settings():
-    import yaml
-
     with open(CONFIGURATION_PATH, "w", encoding="utf-8") as f:
         yaml.dump(get_settings(), f)
